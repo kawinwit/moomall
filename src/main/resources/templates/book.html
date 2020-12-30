@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>book</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<body style=" min-height: 900px;">
+
+<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <ul class="navbar-right">
+                <li><a href="#" id="cart"><i class="fa fa-shopping-cart"></i> Cart <span id="allItem" class="badge">3</span></a></li>
+            </ul> <!--end navbar-right -->
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="index.php">Home</a></li>
+                <li><a href="about.php">About</a></li>
+
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<div class="shopping-cart" style="display: none;">
+    <div class="shopping-cart-header">
+        <i class="fa fa-shopping-cart cart-icon"></i><span class="badge">3</span>
+        <div class="shopping-cart-total">
+            <span class="lighter-text">Total:</span>
+            <span class="main-color-text">$2,229.97</span>
+        </div>
+    </div> <!--end shopping-cart-header -->
+
+    <ul class="shopping-cart-items">
+        <li class="clearfix">
+            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/cart-item1.jpg" alt="item1"/>
+            <span class="item-name">Sony DSC-RX100M III</span>
+            <span class="item-price">$849.99</span>
+            <span class="item-quantity">Quantity: 01</span>
+        </li>
+
+        <li class="clearfix">
+            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/cart-item2.jpg" alt="item1"/>
+            <span class="item-name">KS Automatic Mechanic...</span>
+            <span class="item-price">$1,249.99</span>
+            <span class="item-quantity">Quantity: 01</span>
+        </li>
+
+        <li class="clearfix">
+            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/cart-item3.jpg" alt="item1"/>
+            <span class="item-name">Kindle, 6" Glare-Free To...</span>
+            <span class="item-price">$129.99</span>
+            <span class="item-quantity">Quantity: 01</span>
+        </li>
+    </ul>
+
+    <a href="#" class="button">Checkout</a>
+</div> <!--end shopping-cart -->
+
+<div id="productDisplay" style="text-align: center;padding: 10px">
+    Confirm book
+</div>
+<div class="col-xs-12" style="text-align: center;padding: 10px">
+    <label>name : </label>
+    <label id="name" th:utext="${name}"></label>
+</div>
+<div class="col-xs-12" style="text-align: center;padding: 10px">
+    <label>color : </label>
+    <label id="color" th:utext="${color}"></label>
+</div>
+<div class="col-xs-12" style="text-align: center;margin: 10px">
+    <label>size : </label>
+    <label id="size" th:utext="${size}" ></label>
+</div>
+
+<div class="col-xs-12" style="text-align: center;margin: 10px">
+    <label>quantity : </label>
+    <label id="quantity" th:utext="${quantity}" th:value="${quantity}"></label>
+</div>
+<div class="col-xs-12" style="text-align: center">
+    <button id="back">back</button>
+    <button id="confirm">confirm</button>
+
+</div>
+</body>
+<script th:inline="javascript">
+
+    var productId = /*[[${productId}]]*/ 'default';
+    var img = "";
+    var urlGetProduct = "http://localhost:8080/product/detail?productId=" + productId;
+    $.ajax({
+        url: urlGetProduct,
+        type: "GET",
+        async: false,
+        beforeSend: function (request) {
+            request.setRequestHeader("Content-Type", "application/json");
+        },
+        success: function (response) {
+            let productDisplay = "";
+            let result = response.result;
+            img = result.img
+            let productDisplayItem = '<div class="col-md-12 col-xs-12">' +
+                '<div id="productId-' + result.productId + '" >' +
+
+                '        <img src="/img/test.png" style="width:80%">' +
+
+                '        </div>' +
+                "</div>";
+
+            // $("#productDisplay").append(productDisplayItem);
+        },
+        error: function (resp) {
+
+        },
+    });
+
+    $("#confirm").click(function () {
+        let obj = {
+            productId: productId,
+            name: $("#name").text(),
+            size: $("#size").text(),
+            color: $("#color").text(),
+            img: $("#img").text(),
+            quantity: $("#quantity").text()
+        };
+        $.ajax({
+            url: "http://localhost:8080/product/book",
+            type: "POST",
+            data: JSON.stringify(obj),
+            async: false,
+            beforeSend: function (request) {
+                request.setRequestHeader("Content-Type", "application/json");
+            },
+            success: function (response) {
+            window.location.href= "http://localhost:8080"
+            },
+            error: function (resp) {
+
+            },
+        });
+    })
+
+    $("#back").click(function () {
+        window.history.back();
+    });
+
+    $.ajax({
+        url: "http://localhost:8080/customer/product",
+        type: "GET",
+        async: false,
+        beforeSend: function (request) {
+            request.setRequestHeader("Content-Type", "application/json");
+        },
+        success: function (response) {
+
+            let allItem =  response.result.allItem;
+            $("#allItem").val(allItem);
+            $("#allItem").text(allItem);
+        },
+        error: function (resp) {
+
+        },
+    });
+</script>
+</html>
